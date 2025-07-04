@@ -60,7 +60,11 @@ io.on("connection", (socket) => {
   });
 
   socket.on("move", (position) => {
-    const roomId = Object.entries(rooms).find((room) => rooms[room][socket.id]);
+    const roomEntry = Object.entries(rooms).find(
+      ([roomId, players]) => players[socket.id]
+    );
+    const roomId = roomEntry?.[0];
+
     if (roomId && rooms[roomId][socket.id]) {
       rooms[roomId][socket.id] = {
         ...rooms[roomId][socket.id],

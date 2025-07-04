@@ -1,4 +1,4 @@
-import React, { useDebugValue, useEffect, useState } from "react";
+import React, { useDebugValue, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { io } from "socket.io-client";
 
@@ -8,50 +8,66 @@ function Gamepage() {
   const roomId = pathSegments[2];
 
   const [users, setusers] = useState([]);
-  const [postion, setPostion] = useState({ x: 200, y: 200, z: 0 });
-
-  const handleKeydown = (e) => {
-    setPostion((prev) => {
-      const step = 10;
-      let { x, y, z } = prev;
-
-      switch (e.key) {
-        case "ArrowUp":
-          y -= step;
-          break;
-        case "ArrowDown":
-          y += step;
-          break;
-        case "ArrowLeft":
-          x -= step;
-          break;
-        case "ArrowRight":
-          x += step;
-          break;
-        case "w":
-          z += step;
-          break;
-        case "s":
-          z -= step;
-          break;
-        default:
-          return prev;
-      }
-
-      const newPos = { x, y, z };
-      socket.emit("move", newPos);
-      return newPos;
-    });
-  };
+  const [position, setPosition] = useState({ x: 0, y: 0, z: 0 }); // Fixed typo
+  const socketRef = useRef(null);
 
   useEffect(() => {
+    // Move handleKeydown inside useEffect to avoid stale closure issues
+    const handleKeydown = (e) => {
+      console.log("Key pressed:", e.key);
+      setPosition((prev) => {
+        const step = 10;
+        let { x, y, z } = prev;
+
+        switch (e.key) {
+          case "ArrowUp":
+            y -= step;
+            break;
+          case "ArrowDown":
+            y += step;
+            break;
+          case "ArrowLeft":
+            x -= step;
+            break;
+          case "ArrowRight":
+            x += step;
+            break;
+          case "w":
+          case "W":
+            z += step;
+            break;
+          case "s":
+          case "S":
+            z -= step;
+            break;
+          default:
+            return prev;
+        }
+
+        const newPos = { x, y, z };
+        if (socketRef.current) {
+          socketRef.current.emit("move", newPos);
+        }
+        return newPos;
+      });
+    };
+
+    // Add event listener
     window.addEventListener("keydown", handleKeydown);
-    return () => window.removeEventListener("keydown", handleKeydown);
-  }, []);
+    
+    // Ensure the window has focus (optional, but can help)
+    window.focus();
+
+    // Cleanup
+    return () => {
+      window.removeEventListener("keydown", handleKeydown);
+    };
+  }, []); // Empty dependency array since handleKeydown is now inside
 
   useEffect(() => {
     const baseurl = import.meta.env.VITE_BACKEND_BASE_URL;
     const socket = io(baseurl);
+    socketRef.current = socket;
 
     socket.emit("join-room", {
       userId: "dogesh123",
@@ -69,15 +85,15 @@ function Gamepage() {
       setusers((prev) => [...prev, data]);
     });
 
-    socket.on("players-update",(players) => {
+    socket.on("players-update", (players) => {
       setusers(players);
-    })
+    });
 
     return () => {
       socket.disconnect();
-      window.removeEventListener("keydown", handleKeydown);
+      // Removed duplicate keydown cleanup
     };
-  }, []);
+  }, [roomId]); // Added roomId as dependency
 
   return (
     <div className="w-full h-full flex justify-center items-center">
