@@ -9,7 +9,6 @@ const Rooms = new mongoose.Schema({
   },
   userId: {
     type: String,
-    unique: true,
     required: true
   },
   username: {
@@ -18,7 +17,6 @@ const Rooms = new mongoose.Schema({
   },
   email: {
     type: String,
-    unique: true,
     required: true
   }
 });
