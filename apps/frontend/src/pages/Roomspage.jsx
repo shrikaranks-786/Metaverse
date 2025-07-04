@@ -1,7 +1,16 @@
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 
 function Roomspage() {
-  const rooms = [1, 2, 3, 4];
+  const [rooms,setrooms] = useState([]);
+  useEffect(()=>{
+    const fetchRooms = async ()=>{
+      const res = await axios.get("https://metaverse-backend-m3pe.onrender.com/getrooms/doremon123")
+      setrooms(res.data.rooms);
+    }
+    fetchRooms();
+  },[])
+
   return (
     <div className="w-full h-full p-4">
       <p className="text-3xl text-center mb-4">Welcome to Metaverse</p>
@@ -17,7 +26,7 @@ function Roomspage() {
               key={room}
               className="bg-gray-200 p-4 rounded-lg shadow hover:bg-gray-300 transition cursor-pointer"
             >
-              Room {room}
+              Room {room.username}
             </div>
           ))}
         </div>
