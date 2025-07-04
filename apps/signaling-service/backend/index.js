@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
-import { connectDb } from "./models/coonectDb.js";
+import { connectDb } from "./models/connectDb.js";
 import roomRoutes from "./routes/roomsRoutes.js"
 
 

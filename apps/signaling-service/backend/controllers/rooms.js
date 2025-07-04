@@ -1,5 +1,4 @@
-import mongoose from "mongoose"
-import Room from "../models/roomsDb.js";
+import Room from "../models/roomsModel.js";
 
 export const createRoom = async (req,res)=>{
     try{
