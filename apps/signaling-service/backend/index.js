@@ -3,10 +3,13 @@ import dotenv from "dotenv";
 import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
-// import { connectRedis } from "./redisConnection";
+import { connectDb } from "./models/coonectDb.js";
+import roomRoutes from "./routes/roomsRoutes.js"
+
 
 const app = express();
 app.use(cors());
+app.use(roomRoutes);
 
 const server = http.createServer(app);
 
@@ -19,9 +22,10 @@ const io = new Server(server, {
 
 dotenv.config();
 
-const port = 8080;
+connectDb();
 
-// connectRedis();
+const port = process.env.PORT || 8080;
+
 
 const rooms = {};
 
