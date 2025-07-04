@@ -4,11 +4,10 @@ import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
 import { connectDb } from "./models/connectDb.js";
-import roomRoutes from "./routes/roomsRoutes.js"
-
+import roomRoutes from "./routes/roomsRoutes.js";
 
 const app = express();
-app.use(express.json())
+app.use(express.json());
 app.use(cors());
 app.use(roomRoutes);
 
@@ -27,7 +26,6 @@ connectDb();
 
 const port = process.env.PORT || 8080;
 
-
 const rooms = {};
 
 io.on("connection", (socket) => {
@@ -39,7 +37,12 @@ io.on("connection", (socket) => {
     if (!rooms[roomid]) {
       rooms[roomid] = {};
     }
-    rooms[roomid][socket.id] = { userid, username, email, position: null };
+    rooms[roomid][socket.id] = {
+      userid,
+      username,
+      email,
+      position: { x: 0, y: 0, z: 0 },
+    };
 
     const otherusers = Object.entries(rooms[roomid])
       .filter(([id]) => id != socket.id)
@@ -47,17 +50,13 @@ io.on("connection", (socket) => {
 
     socket.emit("existing-players", otherusers);
 
-    socket
-      .to(roomid)
-      .emit("user-joined", { socketId: socket.id, userid, username });
-  });
-
-  socket.on("existing-players",(data)=>{
-    console.log(data);
-  })
-
-  socket.on("disconnect", () => {
-    console.log("A user disconnected:", socket.id);
+    socket.to(roomid).emit("user-joined", {
+      socketId: socket.id,
+      userid,
+      username,
+      email,
+      position: { x: 0, y: 0, z: 0 },
+    });
   });
 });
 

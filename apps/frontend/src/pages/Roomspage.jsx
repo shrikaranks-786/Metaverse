@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { createRoom } from "../../helpers/room";
+import { Link } from "react-router-dom";
 
 function Roomspage() {
   const [rooms, setrooms] = useState([]);
@@ -24,7 +25,11 @@ function Roomspage() {
   }, [fetchUser]);
 
   const createRoomforuser = async () => {
-    const response = await createRoom("bahu 2", "bahu 123", "bahu 456@gmail.com");
+    const response = await createRoom(
+      "bahu 2",
+      "bahu 123",
+      "bahu 456@gmail.com"
+    );
     setfetchUser(true);
   };
 
@@ -45,12 +50,14 @@ function Roomspage() {
           </div>
           <div className="mx-auto grid grid-cols-3 gap-4 mt-56">
             {rooms.map((room) => (
-              <div
-                key={room}
-                className="bg-gray-200 p-4 rounded-lg shadow hover:bg-gray-300 transition cursor-pointer"
-              >
-                Room {room.username}
-              </div>
+              <Link key={room.roomId} to={`/rooms/${room.roomId}`}>
+                <div
+                  key={room}
+                  className="bg-gray-200 p-4 rounded-lg shadow hover:bg-gray-300 transition cursor-pointer"
+                >
+                  Room {room.username}
+                </div>
+              </Link>
             ))}
           </div>
         </div>
