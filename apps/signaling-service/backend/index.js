@@ -58,6 +58,17 @@ io.on("connection", (socket) => {
       position: { x: 0, y: 0, z: 0 },
     });
   });
+
+  socket.on("move", (position) => {
+    const roomId = Object.entries(rooms).find((room) => rooms[room][socket.id]);
+    if (roomId && rooms[roomId][socket.id]) {
+      rooms[roomId][socket.id] = {
+        ...rooms[roomId][socket.id],
+        ...position,
+      };
+      io.to(roomId).emit("players-update", rooms[roomId]);
+    }
+  });
 });
 
 server.listen(port, (req, res) => {
